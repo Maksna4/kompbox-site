@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Оценка работы</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<form id="surveyForm">
+    <div class="form-group">
+        <label class="form-label required">Выполнена ли работа?</label>
+        <div class="radio-group">
+            <label><input type="radio" name="workDone" value="да" required> Да</label>
+            <label><input type="radio" name="workDone" value="нет"> Нет</label>
+            <label><input type="radio" name="workDone" value="не полностью"> Не полностью</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label required">Имеются ли недостатки?</label>
+        <div class="radio-group">
+            <label><input type="radio" name="hasDefects" value="да" required> Да</label>
+            <label><input type="radio" name="hasDefects" value="нет"> Нет</label>
+        </div>
+    </div>
+
+    <div class="form-group" id="defectsDetailsGroup" style="display: none;">
+        <label class="form-label">Если есть недостатки, опишите:</label>
+        <textarea id="defectsDetails" rows="4"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label required">Оцените работу</label>
+        <select id="ratingSelect" required>
+            <option value="">Выберите оценку</option>
+            <option value="1">1 - Очень плохо</option>
+            <option value="2">2 - Плохо</option>
+            <option value="3">3 - Нормально</option>
+            <option value="4">4 - Хорошо</option>
+            <option value="5">5 - Отлично</option>
+        </select>
+    </div>
+
+    <button type="submit" class="submit-btn">Отправить</button>
+</form>
+
+<div id="ratingSection" style="display:none; margin-top:2rem;">
+    <h2>Рейтинг сотрудников</h2>
+    <table class="rating-table">
+        <thead>
+            <tr>
+                <th>Сотрудник</th>
+                <th>Должность</th>
+                <th>Рейтинг</th>
+                <th>Дата</th>
+            </tr>
+        </thead>
+        <tbody id="ratingTableBody"></tbody>
+    </table>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2>Ваша анкета отправлена</h2>
+        <button onclick="closeModal()" style="margin-top: 1rem;">Закрыть</button>
+    </div>
+</div>
+
+<script src="../../js/main.js"></script>
+</body>
+</html>

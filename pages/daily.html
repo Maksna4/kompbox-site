@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ежедневник</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<div class="container">
+    <h2>Мой ежедневник</h2>
+    <form id="taskForm">
+        <input type="text" id="newTask" placeholder="Введите задачу..." required />
+        <button type="submit">Добавить</button>
+    </form>
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+const taskForm = document.getElementById('taskForm');
+const taskInput = document.getElementById('newTask');
+const taskList = document.getElementById('taskList');
+
+async function loadTasks() {
+    const response = await fetch('/api/daily/tasks', {
+        headers: { "Authorization": `Bearer ${localStorage.getItem('user_token') || ''}` }
+    });
+    return await response.json();
+}
+
+async function saveTask(task) {
+    await fetch('/api/daily/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('user_token') || ''}`
+        },
+        body: JSON.stringify({ task })
+    });
+}
+
+function escapeHTML(str) {
+    return str.replace(/[&<>"']/g, tag => ({
+        '&': '&amp;',
+        '<': '<',
+        '>': '>',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[tag]));
+}
+
+window.deleteTask = async function(e, task) {
+    e.preventDefault();
+    await fetch('/api/daily/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('user_token') || ''}`
+        },
+        body: JSON.stringify({ task })
+    });
+    const tasks = await loadTasks();
+    renderTasks(tasks);
+};
+
+function renderTasks(tasks) {
+    taskList.innerHTML = tasks.map(task => `
+        <li>
+            <span>${escapeHTML(task)}</span>
+            <button onclick="deleteTask(event, '${task}')">Удалить</button>
+        </li>
+    `).join('');
+}
+
+taskForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const text = taskInput.value.trim();
+    if (!text) return;
+    await saveTask(text);
+    taskInput.value = '';
+    const tasks = await loadTasks();
+    renderTasks(tasks);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Персональный календарь</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar @6/main.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar @6/main.min.css">
+</head>
+<body>
+<div class="container">
+    <h2>Ваш календарь</h2>
+
+    <form id="eventForm">
+        <input type="text" id="eventTitle" placeholder="Название события" required />
+        <input type="datetime-local" id="eventDate" required />
+        <button type="submit">Добавить событие</button>
+    </form>
+
+    <div id="calendar"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function () {
+    const USER_TOKEN = localStorage.getItem('user_token') || '';
+    const IS_ADMIN = false;
+
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ru',
+        editable: false,
+        events: async function(fetchInfo, successCallback, failureCallback) {
+            try {
+                const response = await fetch("/api/calendar/events", {
+                    headers: { "Authorization": `Bearer ${USER_TOKEN}` }
+                });
+                const data = await response.json();
+                successCallback(data);
+            } catch (e) {
+                failureCallback(e);
+            }
+        },
+        eventContent: function(arg) {
+            return {
+                html: `<div class="fc-event-main">
+                         <b>${arg.event.title}</b><br/>
+                         <small>${arg.event.extendedProps.user_id ? 'Личное' : 'Общее'}</small>
+                       </div>`
+            };
+        }
+    });
+
+    calendar.render();
+
+    document.getElementById("eventForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const title = document.getElementById("eventTitle").value;
+        const date = document.getElementById("eventDate").value;
+
+        const response = await fetch("/api/calendar/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('user_token') || ''}`
+            },
+            body: JSON.stringify({ title, date })
+        });
+
+        if (response.ok) {
+            calendar.refetchEvents();
+            document.getElementById("eventForm").reset();
+        } else {
+            alert("Ошибка добавления события");
+        }
+    });
+});
+</script>
+</body>
+</html>

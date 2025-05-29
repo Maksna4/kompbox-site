@@ -1,0 +1,21 @@
+# .gitignore
+__pycache__
+*.pyc
+.env
+.env.local
+*.env.*
+!.env.example
+logs/
+data/
+*.sqlite
+*.log
+*.tmp
+*.swp
+*.swo
+*.swn
+venv/
+env/
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
